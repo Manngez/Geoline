@@ -1,0 +1,10 @@
+{
+  "name": "Geoline",
+  "short_name": "Geoline",
+  "description": "Connect American cities. Don't cross the line.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#030914",
+  "theme_color": "#071426",
+  "icons": [{"src":"assets/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
