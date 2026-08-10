@@ -1,9 +1,17 @@
-matches.forEach(name => {
-  const b=document.createElement('button'); b.type='button'; b.className='suggestion-button'; b.textContent=name;
-  b.addEventListener('click', () => { els.cityInput.value=name; hideSuggestions(); els.cityInput.focus(); });
-  els.suggestions.appendChild(b);
-});
-els.suggestions.classList.remove('hidden');
+function updateSuggestions() {
+  const q = normalizeText(els.cityInput.value);
+  if (q.length < 2 || els.cityInput.disabled) return hideSuggestions();
+  const starts = COMMON_PLACES.filter(p => normalizeText(p).startsWith(q));
+  const contains = COMMON_PLACES.filter(p => !normalizeText(p).startsWith(q) && normalizeText(p).includes(q));
+  const matches = [...starts,...contains].slice(0,7);
+  if (!matches.length) return hideSuggestions();
+  els.suggestions.innerHTML='';
+  matches.forEach(name => {
+    const b=document.createElement('button'); b.type='button'; b.className='suggestion-button'; b.textContent=name;
+    b.addEventListener('click', () => { els.cityInput.value=name; hideSuggestions(); els.cityInput.focus(); });
+    els.suggestions.appendChild(b);
+  });
+  els.suggestions.classList.remove('hidden');
 }
 function hideSuggestions() { els.suggestions?.classList.add('hidden'); }
 
