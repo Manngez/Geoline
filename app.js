@@ -4,4 +4,5 @@
 document.write('<script src="app-core.js"><\/script>');
 document.write('<script src="app-map.js"><\/script>');
 document.write('<script src="app-game.js"><\/script>');
+document.write('<script src="settlement-filter.js"><\/script>');
 document.write('<script src="app-online.js"><\/script>');
