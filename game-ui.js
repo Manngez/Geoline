@@ -9,6 +9,18 @@
     const quitGameButton = document.getElementById('quitGameButton');
     if (!gameScreen || !mapWrap || document.getElementById('gameMapControls')) return;
 
+    const AUTO_MIN_ZOOM = 3;
+    const fullRouteFit = fitRoute;
+
+    // Normal gameplay may fit the route, but never zoom farther out than level 3.
+    // The original fitRoute function is preserved for the explicit “Fit full route” action.
+    fitRoute = function constrainedAutoFitRoute() {
+      fullRouteFit();
+      if (map && map.getZoom() < AUTO_MIN_ZOOM) {
+        map.setZoom(AUTO_MIN_ZOOM, {animate: false});
+      }
+    };
+
     const controls = document.createElement('div');
     controls.id = 'gameMapControls';
     controls.className = 'game-map-controls';
@@ -65,7 +77,9 @@
 
     menuFitRouteButton.addEventListener('click', () => {
       closeMenu();
-      fitRouteButton?.click();
+      // Deliberately bypass the automatic zoom floor when the player asks
+      // to see the complete route.
+      fullRouteFit();
     });
 
     menuQuitGameButton.addEventListener('click', () => {
@@ -85,7 +99,7 @@
     }
     syncRouteCount();
 
-    // Keep Leaflet aware of the map's new full-screen dimensions.
+    // Keep Leaflet aware of the map's full-screen dimensions.
     const originalShowScreen = showScreen;
     showScreen = function immersiveShowScreen(name) {
       originalShowScreen(name);
