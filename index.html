@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#071426" />
+  <meta name="description" content="Geoline — connect American cities without crossing your route." />
+  <title>Geoline — Connect America. Don't Cross the Line.</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://unpkg.com" crossorigin />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <button class="brand" type="button" data-screen="home" aria-label="Geoline home">
+        <img src="assets/logo.svg" alt="Geoline" />
+      </button>
+      <button id="soundToggle" class="icon-button" type="button" aria-label="Toggle sound" title="Sound">🔊</button>
+    </header>
+
+    <main id="app" aria-live="polite">
+      <section id="homeScreen" class="screen active hero-screen">
+        <div class="hero-glow hero-glow-one"></div>
+        <div class="hero-glow hero-glow-two"></div>
+        <div class="hero-copy">
+          <div class="eyebrow">A geography strategy game</div>
+          <h1>CONNECT AMERICA.<br><span>DON'T CROSS THE LINE.</span></h1>
+          <p class="hero-subtitle">Name U.S. cities, connect them on the map, and keep the route alive. The first player to cross an earlier line loses.</p>
+          <div class="hero-actions">
+            <button class="primary-button big" type="button" data-screen="setup">Play now <span>→</span></button>
+            <button class="secondary-button big" type="button" data-screen="howto">How to play</button>
+          </div>
+          <div class="feature-strip" aria-label="Game features">
+            <div><strong>2–4</strong><span>Local players</span></div>
+            <div><strong>1v1</strong><span>Online rooms</span></div>
+            <div><strong>USA</strong><span>Cities & towns</span></div>
+          </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="route-card">
+            <div class="route-card-label">LIVE ROUTE</div>
+            <svg viewBox="0 0 640 390" role="img">
+              <defs>
+                <linearGradient id="land" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0e3151"/><stop offset="1" stop-color="#081d34"/></linearGradient>
+                <linearGradient id="route" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#52f6ff"/><stop offset="1" stop-color="#ff4f9a"/></linearGradient>
+                <filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              </defs>
+              <path class="usa-silhouette" fill="url(#land)" d="M66 109l39-21 36 5 26-27 49 9 33-10 32 15 56-4 23 17 40-12 36 16 36-7 39 25 46 9 25 29 24 5-5 33-25 12-5 29-32 13-11 35-31 14-12 47-27-4-23-42-27-22-34 6-28-22-41 5-31-23-28 9-37-16-39 3-20-27-32-7-21-28-30-2-24-25 9-33-25-25 24-37z" opacity=".96"/>
+              <path d="M119 162 C177 103 219 236 286 183 S395 111 445 208 S516 288 569 176" fill="none" stroke="url(#route)" stroke-width="7" stroke-linecap="round" filter="url(#glow)"/>
+              <g fill="#fff" stroke="#52f6ff" stroke-width="5" filter="url(#glow)"><circle cx="119" cy="162" r="8"/><circle cx="286" cy="183" r="8"/><circle cx="445" cy="208" r="8"/><circle cx="569" cy="176" r="8"/></g>
+              <circle cx="391" cy="144" r="16" fill="#ff4f9a" opacity=".9" filter="url(#glow)"/><path d="M382 135l18 18m0-18l-18 18" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+            </svg>
+            <div class="route-legend"><span><i class="cyan-dot"></i> Build the route</span><span><i class="pink-dot"></i> Avoid crossings</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="setupScreen" class="screen content-screen">
+        <div class="section-heading">
+          <button class="back-button" data-screen="home" type="button">←</button>
+          <div><div class="eyebrow">Start a game</div><h2>Choose how you want to play</h2></div>
+        </div>
+        <div class="mode-grid">
+          <button class="mode-card featured" type="button" data-mode="local">
+            <span class="mode-icon">👥</span><span class="mode-copy"><strong>Pass & Play</strong><small>2–4 players on one device</small></span><span class="mode-arrow">→</span>
+          </button>
+          <button class="mode-card" type="button" data-mode="host">
+            <span class="mode-icon">🌐</span><span class="mode-copy"><strong>Host Online Game</strong><small>Create a room for a friend</small></span><span class="mode-arrow">→</span>
+          </button>
+          <button class="mode-card" type="button" data-mode="join">
+            <span class="mode-icon">🔗</span><span class="mode-copy"><strong>Join Online Game</strong><small>Enter a six-character room code</small></span><span class="mode-arrow">→</span>
+          </button>
+          <button class="mode-card" type="button" data-mode="solo">
+            <span class="mode-icon">🧭</span><span class="mode-copy"><strong>Solo Practice</strong><small>Explore routes without turns</small></span><span class="mode-arrow">→</span>
+          </button>
+        </div>
+      </section>
+
+      <section id="playersScreen" class="screen content-screen compact-screen">
+        <div class="section-heading">
+          <button class="back-button" data-screen="setup" type="button">←</button>
+          <div><div class="eyebrow">Pass & Play</div><h2>Who is playing?</h2></div>
+        </div>
+        <div class="panel player-panel">
+          <div id="playerInputs" class="player-inputs"></div>
+          <div class="player-tools">
+            <button id="addPlayerButton" class="secondary-button" type="button">+ Add player</button>
+            <span id="playerCountHint">2 of 4 players</span>
+          </div>
+          <button id="startLocalButton" class="primary-button wide" type="button">Start game →</button>
+        </div>
+      </section>
+
+      <section id="onlineScreen" class="screen content-screen compact-screen">
+        <div class="section-heading">
+          <button class="back-button" data-screen="setup" type="button">←</button>
+          <div><div id="onlineEyebrow" class="eyebrow">Online</div><h2 id="onlineTitle">Online game</h2></div>
+        </div>
+        <div id="onlinePanel" class="panel online-panel"></div>
+      </section>
+
+      <section id="howtoScreen" class="screen content-screen">
+        <div class="section-heading">
+          <button class="back-button" data-screen="home" type="button">←</button>
+          <div><div class="eyebrow">60-second rules</div><h2>How Geoline works</h2></div>
+        </div>
+        <div class="rules-grid">
+          <article class="rule-card"><span>01</span><div><h3>Name a U.S. place</h3><p>Start with any city or town in the United States. Geoline finds it and drops a marker on the map.</p></div></article>
+          <article class="rule-card"><span>02</span><div><h3>Take turns</h3><p>Each player names a new place. Every new location connects to the previous one, building a shared route.</p></div></article>
+          <article class="rule-card danger"><span>03</span><div><h3>Never cross the route</h3><p>If your new line crosses any earlier non-adjacent line, you lose the round immediately.</p></div></article>
+          <article class="rule-card"><span>04</span><div><h3>No repeats</h3><p>A place already used in the current game cannot be played again. Think ahead and trap your opponent.</p></div></article>
+        </div>
+        <div class="example-panel">
+          <div><div class="eyebrow">Example</div><h3>Seattle → Denver → Miami → Boston...</h3><p>The map gets harder every turn. A city that looks safe can create a long line straight across an earlier segment.</p></div>
+          <button class="primary-button" data-screen="setup" type="button">Got it — play →</button>
+        </div>
+      </section>
+
+      <section id="gameScreen" class="screen game-screen">
+        <div class="game-layout">
+          <aside class="game-sidebar">
+            <div class="game-status-card">
+              <div class="eyebrow">Current turn</div>
+              <div class="turn-row"><span id="turnDot" class="turn-dot"></span><strong id="currentPlayerName">Player 1</strong></div>
+              <div id="onlineStatus" class="online-status hidden"></div>
+            </div>
+            <form id="cityForm" class="city-form">
+              <label for="cityInput">Enter a U.S. city or town</label>
+              <div class="search-row">
+                <input id="cityInput" name="city" autocomplete="off" placeholder="e.g. Austin, TX" maxlength="80" required />
+                <button id="submitCityButton" type="submit" class="primary-button">Play</button>
+              </div>
+              <div id="suggestions" class="suggestions hidden"></div>
+              <p class="form-hint">Press Play to look up the place. Suggestions are local and do not send requests while you type.</p>
+            </form>
+            <div class="route-summary">
+              <div class="route-summary-head"><strong>Route</strong><span id="routeCount">0 places</span></div>
+              <ol id="routeList" class="route-list"></ol>
+            </div>
+            <div class="sidebar-actions">
+              <button id="fitRouteButton" class="secondary-button" type="button">⌖ Fit route</button>
+              <button id="quitGameButton" class="ghost-button danger-text" type="button">Quit game</button>
+            </div>
+          </aside>
+          <div class="map-wrap">
+            <div id="map" role="application" aria-label="Geoline game map"></div>
+            <div class="map-badge"><span class="pulse-dot"></span><span id="mapBadgeText">Route ready</span></div>
+            <div id="toast" class="toast hidden"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer"><span>GEOLINE · Built for geography, strategy and friendly rivalry.</span><span>Map © OpenStreetMap contributors</span></footer>
+  </div>
+
+  <div id="placeModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="placeModalTitle">
+    <div class="modal-card">
+      <div class="modal-kicker">Choose the right place</div>
+      <h3 id="placeModalTitle">Multiple matches found</h3>
+      <p>Select the city or town you meant.</p>
+      <div id="placeChoices" class="place-choices"></div>
+      <button id="cancelPlaceModal" class="ghost-button" type="button">Cancel</button>
+    </div>
+  </div>
+
+  <div id="resultModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+    <div class="modal-card result-card">
+      <div id="resultIcon" class="result-icon">⚡</div>
+      <div class="modal-kicker">Route crossed</div>
+      <h3 id="resultTitle">Game over</h3>
+      <p id="resultText"></p>
+      <div id="resultRoute" class="result-route"></div>
+      <div class="result-actions"><button id="playAgainButton" class="primary-button" type="button">Play again</button><button id="resultHomeButton" class="secondary-button" type="button">Main menu</button></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
