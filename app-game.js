@@ -159,12 +159,3 @@ async function onCitySubmit(event) {
     updateGameUI();
   }
 }
-
-function updateSuggestions() {
-  const q = normalizeText(els.cityInput.value);
-  if (q.length < 2 || els.cityInput.disabled) return hideSuggestions();
-  const starts = COMMON_PLACES.filter(p => normalizeText(p).startsWith(q));
-  const contains = COMMON_PLACES.filter(p => !normalizeText(p).startsWith(q) && normalizeText(p).includes(q));
-  const matches = [...starts,...contains].slice(0,7);
-  if (!matches.length) return hideSuggestions();
-  els.suggestions.innerHTML='';
