@@ -74,6 +74,7 @@ function updateGameUI() {
 }
 
 function resetGameState(keepPlayers=true) {
+  clearTimeout(resultTimer);
   game.route=[]; game.currentIndex=0; game.finished=false; resultPayload=null;
   if (!keepPlayers) game.players=[];
   if (map) { renderMapState(); map.setView([39.2,-98.4],4); }
@@ -82,6 +83,7 @@ function resetGameState(keepPlayers=true) {
 }
 
 function startGame(mode, players) {
+  clearTimeout(resultTimer);
   game.mode = mode;
   game.players = players.map((p,i) => ({name:p.name || `Player ${i+1}`}));
   game.currentIndex=0; game.route=[]; game.finished=false; resultPayload=null;
@@ -114,14 +116,20 @@ function applyMove(place, playerIndex, {broadcast=true}={}) {
 }
 
 function showResult() {
+  clearTimeout(resultTimer);
   const loser = game.players[resultPayload?.loserIndex]?.name || 'The player';
   const solo = game.mode === 'solo';
   els.resultIcon.textContent = solo ? '🧭' : '⚡';
   els.resultTitle.textContent = solo ? 'Route crossed' : `${loser} crossed the line`;
   els.resultText.textContent = solo ? `Your practice route lasted ${game.route.length} places before it crossed an earlier segment.` : `${loser} loses the round. The route survived ${game.route.length} places.`;
   els.resultRoute.textContent = game.route.map(p => `${p.name}${p.stateCode ? `, ${p.stateCode}` : ''}`).join(' → ');
-  els.resultModal.classList.remove('hidden');
-  setTimeout(() => { if (resultPayload?.intersection && map) map.setView([resultPayload.intersection.lat,resultPayload.intersection.lon], Math.max(map.getZoom(),5)); }, 220);
+  els.resultModal.classList.add('hidden');
+  if (resultPayload?.intersection && map) {
+    showCrossMarker(resultPayload.intersection);
+    map.setView([resultPayload.intersection.lat,resultPayload.intersection.lon], Math.max(map.getZoom(),7), {animate:true});
+    showToast('Crossing found — the two intersecting lines are highlighted.', 'error', 2200);
+  }
+  resultTimer = setTimeout(() => els.resultModal.classList.remove('hidden'), 2400);
 }
 
 async function submitResolvedPlace(place) {
