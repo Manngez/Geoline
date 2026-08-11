@@ -42,6 +42,7 @@ function sendMessage(payload) { if (game.conn?.open) { try { game.conn.send(payl
 function publicState() { return {players:game.players,currentIndex:game.currentIndex,route:game.route,finished:game.finished,resultPayload}; }
 function sendSync() { sendMessage({type:'sync', state:publicState()}); }
 function consumeState(s) {
+  clearTimeout(resultTimer);
   game.players=s.players||game.players; game.currentIndex=s.currentIndex||0; game.route=s.route||[]; game.finished=!!s.finished; resultPayload=s.resultPayload||null;
   renderMapState(); updateGameUI(); if (game.route.length) fitRoute();
   if (game.finished && resultPayload) showResult(); else els.resultModal.classList.add('hidden');
