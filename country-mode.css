@@ -1,0 +1,109 @@
+.country-picker {
+  margin: 0 0 22px;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: linear-gradient(145deg,rgba(15,38,61,.78),rgba(8,22,38,.78));
+  box-shadow: 0 12px 32px rgba(0,0,0,.13);
+}
+.country-picker-copy {
+  display: grid;
+  gap: 5px;
+}
+.country-picker-copy .eyebrow {
+  margin-bottom: 2px;
+}
+.country-picker-copy strong {
+  font-size: 18px;
+}
+.country-picker-copy > span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.country-picker-options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.country-choice {
+  min-height: 52px;
+  padding: 8px 12px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid rgba(153,201,229,.18);
+  border-radius: 15px;
+  background: rgba(255,255,255,.035);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease, transform .15s ease;
+}
+.country-choice:hover {
+  border-color: rgba(84,241,255,.38);
+}
+.country-choice.active {
+  border-color: rgba(84,241,255,.58);
+  background: rgba(84,241,255,.09);
+  box-shadow: inset 0 0 0 1px rgba(84,241,255,.08);
+}
+.country-flag {
+  font-size: 24px;
+  line-height: 1;
+}
+.country-name {
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.country-check {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: rgba(255,255,255,.06);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+.country-choice.active .country-check {
+  color: #031018;
+  background: var(--cyan);
+}
+.country-picker-nudge {
+  animation: countryNudge .28s ease;
+}
+@keyframes countryNudge {
+  0%,100% { transform: translateX(0); }
+  35% { transform: translateX(-4px); }
+  70% { transform: translateX(4px); }
+}
+@media (max-width: 680px) {
+  .country-picker {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 15px;
+  }
+  .country-picker-options {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    justify-content: stretch;
+  }
+  .country-choice {
+    min-width: 0;
+  }
+}
+@media (max-width: 390px) {
+  .country-name {
+    font-size: 11px;
+  }
+  .country-flag {
+    font-size: 21px;
+  }
+}
