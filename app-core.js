@@ -19,6 +19,7 @@ let mapLayers = [];
 let crossLayer = null;
 let lastGeocodeAt = 0;
 let toastTimer = null;
+let resultTimer = null;
 let resultPayload = null;
 
 const game = {
@@ -137,8 +138,24 @@ function renderMapState() {
 
 function showCrossMarker(intersection) {
   if (!map || !intersection) return;
+  if (crossLayer) { try { map.removeLayer(crossLayer); } catch {} }
+  const layers = [];
+  const crossedIndex = resultPayload?.crossedSegmentIndex;
+  if (Number.isInteger(crossedIndex) && game.route.length >= 2) {
+    const crossedStart = game.route[crossedIndex];
+    const crossedEnd = game.route[crossedIndex + 1];
+    const newStart = game.route[game.route.length - 2];
+    const newEnd = game.route[game.route.length - 1];
+    if (crossedStart && crossedEnd) {
+      layers.push(L.polyline([[crossedStart.lat,crossedStart.lon],[crossedEnd.lat,crossedEnd.lon]], {className:'crossed-route-line', color:'#ffd166', weight:10, opacity:.95, lineCap:'round', interactive:false}));
+    }
+    if (newStart && newEnd) {
+      layers.push(L.polyline([[newStart.lat,newStart.lon],[newEnd.lat,newEnd.lon]], {className:'crossing-route-line', color:'#ff4f9a', weight:10, opacity:.95, lineCap:'round', interactive:false}));
+    }
+  }
   const icon = L.divIcon({className:'', html:'<div class="cross-marker">×</div>', iconSize:[28,28], iconAnchor:[14,14]});
-  crossLayer = L.marker([intersection.lat, intersection.lon], {icon, interactive:false}).addTo(map);
+  layers.push(L.marker([intersection.lat, intersection.lon], {icon, interactive:false}));
+  crossLayer = L.layerGroup(layers).addTo(map);
 }
 
 function fitRoute() {
