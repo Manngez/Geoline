@@ -3,7 +3,7 @@
 // Broader place search for Geoline.
 // Local suggestions stay instant, while pressing Play searches all enabled countries.
 (function () {
-  const SEARCH_CACHE_PREFIX = 'geoline:place-search-v4:';
+  const SEARCH_CACHE_PREFIX = 'geoline:place-search-v5:';
   const ALLOWED_SETTLEMENT_TYPES = new Set([
     'city', 'town', 'village', 'hamlet', 'municipality', 'borough', 'locality'
   ]);
@@ -154,7 +154,7 @@
     lastGeocodeAt = Date.now();
   }
 
-  async function nominatimFreeTextRequest(query, useSettlementFilter) {
+  async function nominatimFreeTextRequest(query, useSettlementFilter, limit=20) {
     await waitForGeocoder();
     const params = new URLSearchParams({
       format:'jsonv2',
@@ -162,7 +162,7 @@
       countrycodes:selectedCountries().join(','),
       addressdetails:'1',
       namedetails:'1',
-      limit:'20',
+      limit:String(limit),
       'accept-language':'en'
     });
     if (useSettlementFilter) params.set('featureType', 'settlement');
@@ -216,9 +216,9 @@
       const bExact = bName === queryCore ? 0 : (bName.startsWith(queryCore) ? 1 : 2);
       const aRegion = hints.regionCode && a.stateCode === hints.regionCode ? 0 : 1;
       const bRegion = hints.regionCode && b.stateCode === hints.regionCode ? 0 : 1;
-      return aRegion - bRegion || aExact - bExact;
+      return aRegion - bRegion || aExact - bExact || String(a.stateCode).localeCompare(String(b.stateCode));
     });
-    return unique.slice(0, 10);
+    return unique.slice(0, 20);
   }
 
   geocodePlace = async function geocodePlaceExpanded(query) {
@@ -226,7 +226,8 @@
     if (cached) return cached;
 
     const hints = parseQueryHints(query);
-    const firstRaw = await nominatimFreeTextRequest(query, true);
+    const ambiguousBareName = !hints.regionCode && Boolean(hints.city) && !/[ ,]/.test(hints.city.trim());
+    const firstRaw = await nominatimFreeTextRequest(query, true, ambiguousBareName ? 40 : 20);
     let combinedRaw = [...firstRaw];
     let results = dedupeAndRank(combinedRaw, query);
 
@@ -246,10 +247,18 @@
       );
     }
 
-    if (!hasStrongMatch) {
-      const fallbackRaw = await nominatimFreeTextRequest(query, false);
+    // Bare names such as "Centerville" are intentionally treated as ambiguous.
+    // Even if the settlement-filtered request found one exact match, perform the
+    // broader request so all plausible exact-name cities/towns can reach the chooser.
+    if (!hasStrongMatch || ambiguousBareName) {
+      const fallbackRaw = await nominatimFreeTextRequest(query, false, ambiguousBareName ? 40 : 20);
       combinedRaw.push(...fallbackRaw);
       results = dedupeAndRank(combinedRaw, query);
+    }
+
+    if (ambiguousBareName) {
+      const exactMatches = results.filter(place => normalizeText(place.name) === queryCore);
+      if (exactMatches.length > 1) results = exactMatches;
     }
 
     searchCacheSet(query, results);
